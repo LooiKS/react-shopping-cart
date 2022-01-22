@@ -1,8 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { loadCart, removeProduct, changeProductQuantity } from '../../services/cart/actions';
+import {
+  loadCart,
+  removeProduct,
+  changeProductQuantity
+} from '../../services/cart/actions';
 import { updateCart } from '../../services/total/actions';
 import CartProduct from './CartProduct';
 import { formatPrice } from '../../services/util';
@@ -18,8 +22,12 @@ class FloatCart extends Component {
     removeProduct: PropTypes.func,
     productToRemove: PropTypes.object,
     changeProductQuantity: PropTypes.func,
-    productToChange: PropTypes.object,
+    productToChange: PropTypes.object
   };
+  constructor(props) {
+    super(props);
+    this.formRef = createRef();
+  }
 
   state = {
     isOpen: false
@@ -47,11 +55,11 @@ class FloatCart extends Component {
     this.setState({ isOpen: false });
   };
 
-  addProduct = product => {
+  addProduct = (product) => {
     const { cartProducts, updateCart } = this.props;
     let productAlreadyInCart = false;
 
-    cartProducts.forEach(cp => {
+    cartProducts.forEach((cp) => {
       if (cp.id === product.id) {
         cp.quantity += product.quantity;
         productAlreadyInCart = true;
@@ -66,10 +74,10 @@ class FloatCart extends Component {
     this.openFloatCart();
   };
 
-  removeProduct = product => {
+  removeProduct = (product) => {
     const { cartProducts, updateCart } = this.props;
 
-    const index = cartProducts.findIndex(p => p.id === product.id);
+    const index = cartProducts.findIndex((p) => p.id === product.id);
     if (index >= 0) {
       cartProducts.splice(index, 1);
       updateCart(cartProducts);
@@ -83,10 +91,20 @@ class FloatCart extends Component {
       currencyFormat,
       currencyId
     } = this.props.cartTotal;
+    const { cartProducts, updateCart } = this.props;
 
     if (!productQuantity) {
       alert('Add some product in the cart!');
     } else {
+      for (let prod of cartProducts) {
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.name = prod.id;
+        input.value = prod.quantity;
+        input.hidden = true;
+        this.formRef.current.appendChild(input);
+      }
+      this.formRef.current.submit();
       alert(
         `Checkout - Subtotal: ${currencyFormat} ${formatPrice(
           totalPrice,
@@ -96,23 +114,33 @@ class FloatCart extends Component {
     }
   };
 
-  changeProductQuantity = changedProduct => {
+  changeProductQuantity = (changedProduct) => {
     const { cartProducts, updateCart } = this.props;
 
-    const product = cartProducts.find(p => p.id === changedProduct.id);
+    const product = cartProducts.find((p) => p.id === changedProduct.id);
     product.quantity = changedProduct.quantity;
     if (product.quantity <= 0) {
       this.removeProduct(product);
     }
     updateCart(cartProducts);
-  }
+  };
 
   render() {
-    const { cartTotal, cartProducts, removeProduct, changeProductQuantity } = this.props;
+    const {
+      cartTotal,
+      cartProducts,
+      removeProduct,
+      changeProductQuantity
+    } = this.props;
 
-    const products = cartProducts.map(p => {
+    const products = cartProducts.map((p) => {
       return (
-        <CartProduct product={p} removeProduct={removeProduct} changeProductQuantity={changeProductQuantity} key={p.id} />
+        <CartProduct
+          product={p}
+          removeProduct={removeProduct}
+          changeProductQuantity={changeProductQuantity}
+          key={p.id}
+        />
       );
     });
 
@@ -184,9 +212,19 @@ class FloatCart extends Component {
                 )}
               </small>
             </div>
-            <div onClick={() => this.proceedToCheckout()} className="buy-btn">
-              Checkout
-            </div>
+            <form
+              action="https://csb-ilnt6-iwr53er7o-looiks.vercel.app/create-checkout-session"
+              method="POST"
+              ref={this.formRef}
+            >
+              <button
+                type="button"
+                className="buy-btn"
+                onClick={this.proceedToCheckout}
+              >
+                Checkout
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -194,7 +232,7 @@ class FloatCart extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   cartProducts: state.cart.products,
   newProduct: state.cart.productToAdd,
   productToRemove: state.cart.productToRemove,
@@ -202,7 +240,9 @@ const mapStateToProps = state => ({
   cartTotal: state.total.data
 });
 
-export default connect(
-  mapStateToProps,
-  { loadCart, updateCart, removeProduct, changeProductQuantity }
-)(FloatCart);
+export default connect(mapStateToProps, {
+  loadCart,
+  updateCart,
+  removeProduct,
+  changeProductQuantity
+})(FloatCart);

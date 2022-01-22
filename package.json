@@ -17,8 +17,8 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"react-scripts start\"",
-    "server": "nodemon server/app",
+    "start": "react-scripts start",
+    "server": "node server/app",
     "wdio": "wdio",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -37,12 +37,7 @@
       "!src/Root.js"
     ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
+  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"],
   "devDependencies": {
     "chai": "^4.2.0",
     "enzyme": "^3.7.0",
