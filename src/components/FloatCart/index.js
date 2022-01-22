@@ -214,7 +214,7 @@ class FloatCart extends Component {
               </small>
             </div>
             <form
-              action="https://ilnt6.sse.codesandbox.io/create-checkout-session"
+              action="https://learning-loop-stripe-backend.herokuapp.com/create-checkout-session"
               method="POST"
               ref={this.formRef}
             >
