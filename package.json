@@ -17,7 +17,7 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"react-scripts start\"",
+    "start": "react-scripts start",
     "server": "nodemon server/app",
     "wdio": "wdio",
     "build": "react-scripts build",
